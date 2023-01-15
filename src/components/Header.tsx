@@ -1,12 +1,5 @@
-import { Link as RouteLink } from "react-router-dom";
-import {
-  Box,
-  Container,
-  Heading,
-  Link,
-  HStack,
-  Button,
-} from "@chakra-ui/react";
+import { Link } from "react-router-dom";
+import { Box, Container, Heading, HStack, Button } from "@chakra-ui/react";
 import type { BoxProps } from "@chakra-ui/react";
 
 export const Header = (props: BoxProps) => {
@@ -18,11 +11,11 @@ export const Header = (props: BoxProps) => {
         </Heading>
 
         <HStack as="nav" fontSize="xl" spacing="4" justifyContent="center">
-          <Button as={RouteLink} to="/" colorScheme="green" variant="ghost">
+          <Button as={Link} to="/" colorScheme="green" variant="ghost">
             Game
           </Button>
           <Button
-            as={RouteLink}
+            as={Link}
             to="/scoreboard"
             colorScheme="green"
             variant="ghost"

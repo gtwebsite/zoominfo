@@ -43,8 +43,6 @@ export const Board = ({ onSelect, ...props }: BoardProps) => {
   const matrix =
     game?.matrix || Array.from(Array(6), () => Array(7).fill("white"));
 
-  console.log(matrix);
-
   // Handle on select each block
   const handleOnSelect = (pos: Position) => {
     // Push up when needed for parent

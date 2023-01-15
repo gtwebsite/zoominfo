@@ -1,5 +1,5 @@
 import { Box, Heading } from "@chakra-ui/react";
-import { Board, Status } from "../components";
+import { Board, Finish, Status } from "../components";
 
 const Index = () => {
   return (
@@ -9,6 +9,7 @@ const Index = () => {
       </Heading>
       <Status mb="6" />
       <Board />
+      <Finish />
     </Box>
   );
 };
