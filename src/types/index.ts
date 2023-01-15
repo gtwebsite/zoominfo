@@ -2,25 +2,27 @@ export type UserColor = "white" | "blue" | "red";
 
 export type Player = "white" | "blue" | "red";
 
-export type Status = "stale" | "start" | "progress" | "end";
+export type Status = "progress" | "end";
 
 export type Position = [number, number];
 
 export interface Game {
-  dateTimeStarted?: Date | string | number;
-  dateTimeEnded?: Date | string | number;
+  dateTimeStarted?: Date;
+  dateTimeEnded?: Date;
   matrix: Player[][];
   moves: number;
-  playing: Player;
-  status: Status;
-  winner: Player | "draw";
+  winner?: Player | "draw";
 }
 
-export interface State {
+export interface Form {
   age: number;
-  games?: Game[];
   name: string;
 }
+
+export type State = Form & {
+  games: Game[];
+  playing: Player;
+};
 
 export interface InitialState {
   moves: number;
@@ -32,5 +34,6 @@ export interface InitialState {
 }
 
 export type Action =
-  | { type: "FILL_MATRIX"; payload: Position }
-  | { type: "START" };
+  | { type: "FORM_SUBMIT"; payload: Form }
+  | { type: "PLAYER_MOVE"; payload: Position }
+  | { type: "START_GAME" };

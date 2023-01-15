@@ -1,62 +1,94 @@
 import { useReducer } from "react";
 import { createContainer } from "react-tracked";
 import { checkWinner } from "../utils";
-import type { Action, InitialState } from "../types";
+import type { Action, Game, State } from "../types";
 
 // Use to for initial values of the state
-const initialState: InitialState = {
-  moves: 0,
-  current: "white",
-  isEnd: false,
-  matrix: Array.from(Array(6), () => Array(7).fill("white")),
-  players: 0,
-  games: 0,
+const initialState: State = {
+  age: 0,
+  games: [],
+  name: "",
+  playing: "white",
 };
 
-// Reducer for  dispatch
-const reducer = (state: InitialState, action: Action): InitialState => {
+// Reducer for dispatching actions
+const reducer = (state: State, action: Action): State => {
   switch (action.type) {
-    case "FILL_MATRIX": {
-      if (state.players === 0) {
+    // Form submitted
+    case "FORM_SUBMIT":
+      return {
+        ...state,
+        ...action.payload,
+      };
+
+    // Player make a move
+    case "PLAYER_MOVE": {
+      // No game, don't proceed
+      if (state.games.length <= 0) {
         return state;
       }
 
-      const matrix = state.matrix;
-      matrix[action.payload[0]][action.payload[1]] = state.current;
+      // Get current game
+      const gameIndex = state.games.length - 1;
+      const game = { ...state.games[gameIndex] };
 
-      const winner = checkWinner(state.matrix);
+      // If current game has ended, don't proceed
+      if (game.dateTimeEnded) {
+        return state;
+      }
+
+      // Assign value to the matrix
+      game.matrix[action.payload[0]][action.payload[1]] = state.playing;
+
+      // Increase move count
+      game["moves"] = state.games[gameIndex].moves + 1;
+
+      // Get winner
+      const winner = checkWinner(game.matrix);
 
       if (winner) {
-        return {
-          ...state,
-          moves: state.moves + 1,
-          isEnd: true,
-          matrix,
-        };
+        // If has winner, fill data
+        game["dateTimeEnded"] = new Date();
+        game["winner"] = winner;
+      } else if (game.moves >= 42) {
+        // If draw
+        game["dateTimeEnded"] = new Date();
+        game["winner"] = "draw";
       }
+
+      // Get all games
+      const games = [...state.games];
+
+      // Update current game with new details
+      games[gameIndex] = game;
+
+      // Reverse player
+      const playing = state.playing === "blue" ? "red" : "blue";
 
       return {
         ...state,
-        current: state.current === "blue" ? "red" : "blue",
-        moves: state.moves + 1,
-        isEnd: false,
-        matrix,
+        playing,
+        games,
       };
     }
-    case "START":
-      return {
-        ...initialState,
-        players: state.players + 1,
-        current:
-          state.current === "white"
-            ? Math.random() < 0.5
-              ? "red"
-              : "blue"
-            : state.current === "blue"
-            ? "red"
-            : "blue",
+
+    // Start a new game
+    case "START_GAME": {
+      const game: Game = {
+        dateTimeStarted: new Date(),
         matrix: Array.from(Array(6), () => Array(7).fill("white")),
+        moves: 0,
       };
+
+      // Get random player
+      const randomPlayer = Math.random() < 0.5 ? "red" : "blue";
+
+      const playing =
+        state.playing === "white" ? randomPlayer : state["playing"];
+
+      return { ...state, games: [...state.games, game], playing };
+    }
+
     default:
       return state;
   }

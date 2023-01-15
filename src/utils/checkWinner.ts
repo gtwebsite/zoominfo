@@ -1,13 +1,13 @@
 /**
  * Run to check the winner from a 4-game board.
  *
- * @param board UserColor[][], 2d array of 3-color state, white | red | blue
- * @returns UserColor, either red or blue or null if no winner
+ * @param board Player[][], 2d array of 3-color state, white | red | blue
+ * @returns Player, either red or blue or null if no winner
  */
 
-import { UserColor } from "../types";
+import { Player } from "../types";
 
-export const checkWinner = (board: UserColor[][]) => {
+export const checkWinner = (board: Player[][]) => {
   // check for horizontal win
   for (let i = 0; i < 6; i++) {
     for (let j = 0; j < 4; j++) {

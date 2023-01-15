@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { HStack, Box, Button, Text, VisuallyHidden } from "@chakra-ui/react";
+import { HStack, Box, VisuallyHidden } from "@chakra-ui/react";
 import type { BoxProps } from "@chakra-ui/react";
 import { useTrackedState, useUpdate } from "../store";
 import { Block } from "./Block";
@@ -31,10 +31,19 @@ export const Board = ({ onSelect, ...props }: BoardProps) => {
   }, []);
 
   // Track data from global state
-  const { current, isEnd, matrix, players } = useTrackedState();
+  const { games, playing } = useTrackedState();
 
-  // Dispatch some actions for global state
+  // Dispatch actions to global state
   const dispatch = useUpdate();
+
+  // Get current game
+  const game = games[games.length - 1];
+
+  // Generate matrix if not available
+  const matrix =
+    game?.matrix || Array.from(Array(6), () => Array(7).fill("white"));
+
+  console.log(matrix);
 
   // Handle on select each block
   const handleOnSelect = (pos: Position) => {
@@ -42,49 +51,26 @@ export const Board = ({ onSelect, ...props }: BoardProps) => {
     onSelect && onSelect(pos);
 
     // Run dispatch to fill the matrix
-    dispatch({ type: "FILL_MATRIX", payload: pos });
-  };
-
-  // Handle restart button
-  const handleRestart = () => {
-    // Run dispatch to start new game
-    dispatch({ type: "START" });
+    dispatch({ type: "PLAYER_MOVE", payload: pos });
   };
 
   return (
-    <>
-      <Box spacing="0" ref={boardRef} {...props}>
-        {matrix.map((row, rowIndex) => (
-          <HStack wrap="wrap" spacing="0" key={`row-${rowIndex}`}>
-            {row.map((col, colIndex) => (
-              <Block
-                key={`block-${rowIndex}-${colIndex}`}
-                user={col || "white"}
-                onClick={() => {
-                  col === "white" && handleOnSelect([rowIndex, colIndex]);
-                }}
-              >
-                <VisuallyHidden>{col}</VisuallyHidden>
-              </Block>
-            ))}
-          </HStack>
-        ))}
-      </Box>
-      <Box mt="4" textAlign="center">
-        {players > 0 ? (
-          <>
-            <Text mb="4">
-              {isEnd ? "Winner is " : "Current player is "}
-              <Text as="strong" color={current}>
-                {current}
-              </Text>
-            </Text>
-            {isEnd && <Button onClick={handleRestart}>Restart</Button>}
-          </>
-        ) : (
-          <Button onClick={handleRestart}>Start the game</Button>
-        )}
-      </Box>
-    </>
+    <Box spacing="0" ref={boardRef} {...props}>
+      {matrix.map((row, rowIndex) => (
+        <HStack wrap="wrap" spacing="0" key={`row-${rowIndex}`}>
+          {row.map((col, colIndex) => (
+            <Block
+              key={`block-${rowIndex}-${colIndex}`}
+              player={col}
+              onClick={() => {
+                col === "white" && handleOnSelect([rowIndex, colIndex]);
+              }}
+            >
+              <VisuallyHidden>{col}</VisuallyHidden>
+            </Block>
+          ))}
+        </HStack>
+      ))}
+    </Box>
   );
 };
